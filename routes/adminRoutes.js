@@ -5,22 +5,16 @@ import protect from '../middleware/authMiddleware.js'
 import authorizeRoles from '../middleware/roleMiddleware.js'
 
 import {
-  createTest,
-  getAllTests,
-  getSingleTest
-} from '../controllers/testController.js'
+  createLabAssistant
+} from '../controllers/adminController.js'
 
 const router = express.Router()
 
-router.get('/', getAllTests)
-
-router.get('/:id', getSingleTest)
-
 router.post(
-  '/',
+  '/create-lab-assistant',
   protect,
   authorizeRoles('admin'),
-  createTest
+  createLabAssistant
 )
 
 export default router

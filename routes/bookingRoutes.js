@@ -1,38 +1,46 @@
 import express from 'express'
-import Booking from '../models/Booking.js'
+
 import protect from '../middleware/authMiddleware.js'
+
+import upload from '../middleware/uploadMiddleware.js'
+
+import {
+  createBooking,
+  getAllBookings,
+  getMyBookings,
+  uploadReport
+} from '../controllers/bookingController.js'
+import authorizeRoles from '../middleware/roleMiddleware.js'
 
 const router = express.Router()
 
-// CREATE BOOKING
-router.post('/', protect, async (req, res) => {
-  try {
-    const booking = await Booking.create({
-      ...req.body,
-      user: req.user,
-    })
+router.post('/', protect, createBooking)
 
-    res.status(201).json(booking)
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    })
-  }
-})
+router.get('/my-bookings', protect, getMyBookings)
 
-// GET MY BOOKINGS
-router.get('/', protect, async (req, res) => {
-  try {
-    const bookings = await Booking.find({
-      user: req.user,
-    })
+router.put(
 
-    res.json(bookings)
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    })
-  }
-})
+  '/upload-report/:id',
+
+  protect,
+
+  authorizeRoles(
+    'lab_assistant',
+    'admin'
+  ),
+
+  upload.single('report'),
+
+  uploadReport
+)
+router.get(
+  '/all',
+  protect,
+  authorizeRoles(
+    'admin',
+    'lab_assistant'
+  ),
+  getAllBookings
+)
 
 export default router
