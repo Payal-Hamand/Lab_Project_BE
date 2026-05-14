@@ -10,6 +10,7 @@ import testRoutes from './routes/testRoutes.js'
 import reportRoutes from './routes/reportRoutes.js'
 import packageRoutes from './routes/packageRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
+import adminSetupRoute from './routes/adminSetupRoute.js'
 
 dotenv.config()
 
@@ -40,6 +41,7 @@ app.use(
 app.use(express.json())
 
 // ROUTES
+app.use('/api/setup', adminSetupRoute)
 app.use('/api/auth', authRoutes)
 
 app.use('/api/tests', testRoutes)

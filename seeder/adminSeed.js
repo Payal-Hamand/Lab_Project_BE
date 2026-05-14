@@ -1,34 +1,38 @@
-import mongoose from 'mongoose'
-
-import dotenv from 'dotenv'
+import express from 'express'
 
 import bcrypt from 'bcryptjs'
 
 import User from '../models/User.js'
 
-dotenv.config()
+const router = express.Router()
 
-mongoose.connect(process.env.MONGO_URI)
-
-const createAdmin = async () => {
+router.get('/create-admin', async (
+  req,
+  res
+) => {
 
   try {
 
-    const hashedPassword = await bcrypt.hash(
-      'admin123',
-      10
-    )
+    const adminExists =
+      await User.findOne({
 
-    const adminExists = await User.findOne({
-      email: 'admin@gmail.com'
-    })
+        email: 'admin@gmail.com'
+
+      })
 
     if (adminExists) {
 
-      console.log('Admin already exists')
-
-      process.exit()
+      return res.json({
+        message:
+          'Admin already exists'
+      })
     }
+
+    const hashedPassword =
+      await bcrypt.hash(
+        'admin123',
+        10
+      )
 
     await User.create({
 
@@ -42,16 +46,17 @@ const createAdmin = async () => {
 
     })
 
-    console.log('Admin Created')
-
-    process.exit()
+    res.json({
+      message:
+        'Admin Created'
+    })
 
   } catch (error) {
 
-    console.log(error)
-
-    process.exit(1)
+    res.status(500).json({
+      message: error.message
+    })
   }
-}
+})
 
-createAdmin()
+export default router
