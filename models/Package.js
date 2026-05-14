@@ -1,23 +1,8 @@
 import mongoose from 'mongoose'
 
-const testSchema = mongoose.Schema(
+const packageSchema = mongoose.Schema(
   {
     title: {
-      type: String,
-      required: true
-    },
-
-    category: {
-      type: String,
-      required: true
-    },
-
-    price: {
-      type: Number,
-      required: true
-    },
-
-    reportTime: {
       type: String,
       required: true
     },
@@ -27,9 +12,25 @@ const testSchema = mongoose.Schema(
       required: true
     },
 
+    price: {
+      type: Number,
+      required: true
+    },
+
+    testsIncluded: [
+      {
+        type: String
+      }
+    ],
+
     image: {
       type: String,
       required: true
+    },
+
+    category: {
+      type: String,
+      default: 'Health Package'
     }
   },
   {
@@ -37,6 +38,9 @@ const testSchema = mongoose.Schema(
   }
 )
 
-const Test = mongoose.model('Test', testSchema)
+const Package = mongoose.model(
+  'Package',
+  packageSchema
+)
 
-export default Test
+export default Package

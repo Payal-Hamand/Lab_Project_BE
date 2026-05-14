@@ -5,25 +5,87 @@ const bookingSchema = mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true
     },
 
-    testName: String,
+    test: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Test',
+      required: true
+    },
 
-    price: Number,
+    patientName: {
+      type: String,
+      required: true
+    },
 
-    bookingDate: String,
+    age: {
+      type: Number,
+      required: true
+    },
 
-    slot: String,
+    gender: {
+      type: String,
+      required: true
+    },
 
-    city: String,
+    phone: {
+      type: String,
+      required: true
+    },
+    assignedLabAssistant: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'User',
+  default: null
+},
 
-    phone: String,
+    address: {
+      type: String,
+      required: true
+    },
+
+    bookingDate: {
+      type: String,
+      required: true
+    },
+
+    bookingTime: {
+      type: String,
+      required: true
+    },
+
+    status: {
+      type: String,
+      default: 'Pending'
+    },
+
+    paymentStatus: {
+      type: String,
+      default: 'Pending'
+    },
+
+    report: {
+      type: String,
+      default: ''
+    },
+   reportId: {
+  type: String,
+  unique: true,
+  sparse: true
+},
+
+verified: {
+  type: Boolean,
+  default: true
+}
+
   },
   {
-    timestamps: true,
+    timestamps: true
   }
 )
 
 const Booking = mongoose.model('Booking', bookingSchema)
 
 export default Booking
+

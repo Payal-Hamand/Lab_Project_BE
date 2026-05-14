@@ -4,22 +4,33 @@ const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: true
     },
 
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
 
     password: {
       type: String,
-      required: true,
+      required: true
     },
+
+    role: {
+      type: String,
+      enum: [
+        'admin',
+        'patient',
+        'lab_assistant',
+        
+      ],
+      default: 'patient'
+    }
   },
   {
-    timestamps: true,
+    timestamps: true
   }
 )
 
