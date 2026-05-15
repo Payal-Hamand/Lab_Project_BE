@@ -1,16 +1,36 @@
-const authorizeRoles = (...roles) => {
+const authorizeRoles =
+  (...roles) => {
 
-  return (req, res, next) => {
+    return (req, res, next) => {
 
-    if (!roles.includes(req.user.role)) {
+      // Safety check
 
-      return res.status(403).json({
-        message: `Role (${req.user.role}) is not allowed`
-      })
+      if (!req.user) {
+
+        return res.status(401).json({
+
+          message:
+            'Unauthorized'
+
+        })
+      }
+
+      if (
+        !roles.includes(
+          req.user.role
+        )
+      ) {
+
+        return res.status(403).json({
+
+          message:
+            'Access Denied'
+
+        })
+      }
+
+      next()
     }
-
-    next()
   }
-}
 
 export default authorizeRoles
