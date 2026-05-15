@@ -1,5 +1,8 @@
-import express from 'express'
 import dotenv from 'dotenv'
+
+dotenv.config()
+import express from 'express'
+
 import cors from 'cors'
 
 import connectDB from './config/db.js'
@@ -12,7 +15,6 @@ import packageRoutes from './routes/packageRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import adminSetupRoute from './routes/adminSetupRoute.js'
 
-dotenv.config()
 
 connectDB()
 

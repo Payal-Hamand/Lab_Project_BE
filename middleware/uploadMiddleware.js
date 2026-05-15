@@ -1,5 +1,7 @@
 import multer from 'multer'
 
+import path from 'path'
+
 import {
   CloudinaryStorage
 } from 'multer-storage-cloudinary'
@@ -11,23 +13,43 @@ const storage =
 
     cloudinary,
 
-    params: {
+    params: async (
+      req,
+      file
+    ) => {
 
-      folder: 'lab-reports',
+      const ext =
+        path.extname(
+          file.originalname
+        )
 
-      resource_type: 'raw',
+      const fileName =
+        file.originalname
+          .replace(ext, '')
+          .replace(/\s+/g, '-')
 
-      allowed_formats: [
-        'pdf',
-        'jpg',
-        'jpeg',
-        'png'
-      ]
+      return {
 
+        folder: 'lab-reports',
+
+        resource_type: 'raw',
+
+        type: 'upload',
+
+        public_id:
+          Date.now() +
+          '-' +
+          fileName,
+
+        format:
+          ext.replace('.', ''),
+
+        flags: 'attachment'
+
+      }
     }
 
   })
-  console.log(storage)
 
 const upload = multer({
   storage

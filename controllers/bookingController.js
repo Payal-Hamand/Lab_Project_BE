@@ -47,6 +47,15 @@ export const createBooking = async (req, res) => {
 
 })
 
+if (age < 1 || age > 99) {
+
+  return res.status(400).json({
+
+    message: 'Age must be between 1 and 100'
+
+  })
+}
+
     res.status(201).json(booking)
 
   } catch (error) {
@@ -83,7 +92,6 @@ export const uploadReport = async (
 ) => {
 
   try {
-    console.log('UPLOAD REPORT CALLED')
 
     const booking =
       await Booking.findById(
@@ -93,18 +101,24 @@ export const uploadReport = async (
     if (!booking) {
 
       return res.status(404).json({
-        message: 'Booking Not Found'
+
+        message:
+          'Booking Not Found'
+
       })
     }
-
-    // File validation
 
     if (!req.file) {
 
       return res.status(400).json({
-        message: 'No File Uploaded'
+
+        message:
+          'No File Uploaded'
+
       })
     }
+
+    // Save Cloudinary URL
 
     booking.report = req.file.path
 
@@ -120,22 +134,25 @@ export const uploadReport = async (
       message:
         'Report Uploaded Successfully',
 
-      reportUrl: booking.report
+      reportUrl:
+        booking.report
 
     })
 
   } catch (error) {
 
-    console.log(
-  'UPLOAD ERROR:',
-  error
-)
+    console.log(error)
 
     res.status(500).json({
-      message: error.message
+
+      message:
+        error.message
+
     })
   }
 }
+
+
 export const getAllBookings = async (
   req,
   res

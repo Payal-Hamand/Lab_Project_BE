@@ -1,4 +1,11 @@
-import { v2 as cloudinary } from 'cloudinary'
+import dotenv from 'dotenv'
+dotenv.config()
+import { v2 as cloudinary }
+from 'cloudinary'
+
+console.log(
+  process.env.CLOUDINARY_API_KEY
+)
 
 cloudinary.config({
 
