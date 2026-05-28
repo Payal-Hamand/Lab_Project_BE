@@ -15,14 +15,27 @@ const bookingSchema = mongoose.Schema(
     },
 
     patientName: {
-      type: String,
-      required: true
-    },
+  type: String,
+  required: true,
+  trim: true,
+  minlength: 3,
+  maxlength: 50
+},
+labOwner: {
+
+  type:
+    mongoose.Schema.Types.ObjectId,
+
+  ref: 'User'
+
+},
 
     age: {
-      type: Number,
-      required: true
-    },
+  type: Number,
+  required: true,
+  min: 1,
+  max: 99
+},
 
     gender: {
       type: String,
@@ -30,9 +43,10 @@ const bookingSchema = mongoose.Schema(
     },
 
     phone: {
-      type: String,
-      required: true
-    },
+  type: String,
+  required: true,
+  match: /^[6-9]\d{9}$/
+},
     assignedLabAssistant: {
   type: mongoose.Schema.Types.ObjectId,
   ref: 'User',
@@ -43,6 +57,27 @@ const bookingSchema = mongoose.Schema(
       type: String,
       required: true
     },
+    flatNo: {
+  type: String,
+  required: true
+},
+
+landmark: {
+  type: String,
+  
+},
+
+city: {
+  type: String,
+  required: true
+},
+
+
+pincode: {
+  type: String,
+  required: true,
+  match: /^[1-9][0-9]{5}$/
+},
 
     bookingDate: {
       type: String,
@@ -55,9 +90,26 @@ const bookingSchema = mongoose.Schema(
     },
 
     status: {
-      type: String,
-      default: 'Pending'
-    },
+
+  type: String,
+
+  enum: [
+
+    'Pending',
+
+    'Assigned',
+
+    'Sample Collected',
+
+    'Processing',
+
+    'Completed'
+
+  ],
+
+  default: 'Pending'
+
+},
 
     paymentStatus: {
       type: String,

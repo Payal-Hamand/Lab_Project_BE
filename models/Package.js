@@ -12,16 +12,19 @@ const packageSchema = mongoose.Schema(
       required: true
     },
 
-    price: {
-      type: Number,
-      required: true
-    },
-
+   price: {
+  type: Number,
+  required: true,
+  min: 1
+},
     testsIncluded: [
-      {
-        type: String
-      }
-    ],
+  {
+    type:
+      mongoose.Schema.Types.ObjectId,
+
+    ref: 'Test'
+  }
+],
 
     image: {
       type: String,
