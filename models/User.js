@@ -24,11 +24,37 @@ const userSchema = mongoose.Schema(
         'admin',
         'patient',
         'lab_assistant',
+        'lab_owner',
         
       ],
       default: 'patient'
-    }
+    },
+    labOwner: {
+
+  type:
+    mongoose.Schema.Types.ObjectId,
+
+  ref: 'User',
+
+  default: null
+
+},
+phone: {
+  type: String
+},
+
+document: {
+  type: String
+},
+servicePincodes: {
+
+  type: [String],
+
+  default: []
+
+},
   },
+  
   {
     timestamps: true
   }

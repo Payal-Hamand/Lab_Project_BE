@@ -14,7 +14,7 @@ import reportRoutes from './routes/reportRoutes.js'
 import packageRoutes from './routes/packageRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import adminSetupRoute from './routes/adminSetupRoute.js'
-
+import userRoutes from './routes/userRoutes.js'
 
 connectDB()
 
@@ -49,6 +49,10 @@ app.use('/api/auth', authRoutes)
 app.use('/api/tests', testRoutes)
 
 app.use('/api/bookings', bookingRoutes)
+app.use(
+  '/api/users',
+  userRoutes
+)
 
 
 app.use('/api/reports', reportRoutes)

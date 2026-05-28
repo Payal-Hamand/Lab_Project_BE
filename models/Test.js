@@ -3,9 +3,11 @@ import mongoose from 'mongoose'
 const testSchema = mongoose.Schema(
   {
     title: {
-      type: String,
-      required: true
-    },
+  type: String,
+  required: true,
+  trim: true,
+  minlength: 2
+},
 
     category: {
       type: String,
@@ -13,9 +15,10 @@ const testSchema = mongoose.Schema(
     },
 
     price: {
-      type: Number,
-      required: true
-    },
+  type: Number,
+  required: true,
+  min: 1
+},
 
     reportTime: {
       type: String,
