@@ -89,7 +89,7 @@ pincode: {
       required: true
     },
 
-    status: {
+  status: {
 
   type: String,
 
@@ -99,22 +99,81 @@ pincode: {
 
     'Assigned',
 
+    'Reached',
+
     'Sample Collected',
 
     'Processing',
+
+    'Report Ready',
 
     'Completed'
 
   ],
 
   default: 'Pending'
-
 },
 
-    paymentStatus: {
-      type: String,
-      default: 'Pending'
-    },
+sampleImages: [
+  {
+    type: String
+  }
+],
+
+sampleId: {
+  type: String,
+  default: ''
+},
+
+sampleCollectedAt: {
+  type: Date
+},
+
+assistantNotes: {
+  type: String,
+  default: ''
+},
+
+paymentScreenshot: {
+  type: String,
+  default: ''
+},
+
+transactionId: {
+  type: String,
+  default: ''
+},
+
+paymentAmount: {
+  type: Number,
+  default: 0
+},
+
+reachedAt: {
+  type: Date
+},
+
+paidAt: {
+  type: Date
+},
+   paymentStatus: {
+
+  type: String,
+
+  enum: [
+
+    'Pending',
+
+    'Paid',
+
+    'Failed',
+
+    'Refunded'
+
+  ],
+
+  default: 'Pending'
+},
 
     report: {
       type: String,

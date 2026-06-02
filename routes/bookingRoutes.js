@@ -84,7 +84,10 @@ import {
 
   assignAssistant,
 
-  getAssignedBookings
+  getAssignedBookings,
+  markReached,
+  uploadSample,
+  markPaymentDone
 
 } from '../controllers/bookingController.js'
 
@@ -177,6 +180,27 @@ router.put(
   upload.single('report'),
 
   uploadReport
+)
+router.put(
+  '/reached/:id',
+  protect,
+  markReached
+)
+
+router.put(
+  '/sample/:id',
+  protect,
+ upload.array(
+  'sampleImages',
+  10
+),
+  uploadSample
+)
+
+router.put(
+  '/payment/:id',
+  protect,
+  markPaymentDone
 )
 
 export default router
