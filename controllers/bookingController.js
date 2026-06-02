@@ -250,7 +250,10 @@ export const getAssignedBookings = async (req, res) => {
     const bookings = await Booking.find({
       assignedLabAssistant: req.user._id,
     })
-      .populate("test")
+      .populate(
+  "test",
+  "title price"
+)
       .populate("user")
       .sort({
         createdAt: -1,

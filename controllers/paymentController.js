@@ -44,12 +44,15 @@ export const createPayment =
           Number(amount) * 100,
 
         redirectUrl:
-          `http://localhost:5000/api/payment/status/${merchantTransactionId}`,
+        //   `http://localhost:5000/api/payment/status/${merchantTransactionId}`,
+
+            `${process.env.BACK_END_URL}/api/payment/status/${merchantTransactionId}`,
 
         redirectMode: "REDIRECT",
 
         callbackUrl:
-          `http://localhost:5000/api/payment/status/${merchantTransactionId}`,
+        //   `http://localhost:5000/api/payment/status/${merchantTransactionId}`,
+            `${process.env.BACK_END_URL}/api/payment/status/${merchantTransactionId}`,
 
         mobileNumber:
           mobileNumber ||
@@ -72,10 +75,16 @@ export const createPayment =
         "/pg/v1/pay" +
         process.env.SALT_KEY;
 
+        console.log(
+        "Payload:",
+        process.env.SALT_KEY,
+      );
+
       const xVerify =
         sha256(key) +
         "###" +
         process.env.SALT_INDEX;
+       
 
       const response =
         await axios.post(
@@ -224,12 +233,12 @@ export const checkPaymentStatus =
   }
 
   return res.redirect(
-    "http://localhost:5173/lab-assistant"
+    `${process.env.FRONT_END_URL}/lab-assistant`
   );
 }
 
       return res.redirect(
-        "http://localhost:5173/lab-assistant"
+        `${process.env.FRONT_END_URL}/lab-assistant`
       );
 
     } catch (error) {
@@ -237,7 +246,7 @@ export const checkPaymentStatus =
       console.log(error);
 
       return res.redirect(
-        "http://localhost:5173/lab-assistant"
+         `${process.env.FRONT_END_URL}/lab-assistant`
       );
     }
   };
