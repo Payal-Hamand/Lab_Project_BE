@@ -1,5 +1,4 @@
-import dotenv from 'dotenv'
-
+import dotenv from 'dotenv' 
 dotenv.config()
 import express from 'express'
 
@@ -15,6 +14,8 @@ import packageRoutes from './routes/packageRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import adminSetupRoute from './routes/adminSetupRoute.js'
 import userRoutes from './routes/userRoutes.js'
+import paymentRoutes from './routes/paymentRoutes.js';
+
 
 connectDB()
 
@@ -58,6 +59,10 @@ app.use(
 app.use('/api/reports', reportRoutes)
 app.use('/api/packages', packageRoutes)
 app.use('/api/admin', adminRoutes)
+app.use(
+  "/api/payment",
+  paymentRoutes
+);
 app.get('/', (req, res) => {
   res.send('API Running...')
 })

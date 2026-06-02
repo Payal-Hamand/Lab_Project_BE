@@ -262,3 +262,139 @@ export const getAssignedBookings = async (req, res) => {
     });
   }
 };
+
+export const markReached = async (req, res) => {
+
+  try {
+
+    const booking =
+      await Booking.findById(
+        req.params.id
+      )
+
+    if (!booking) {
+
+      return res.status(404).json({
+        message: 'Booking Not Found'
+      })
+    }
+
+    booking.status = 'Reached'
+
+    booking.reachedAt = new Date()
+
+    await booking.save()
+
+    res.status(200).json({
+      message: 'Assistant Reached Patient Home'
+    })
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    })
+  }
+}
+
+
+export const uploadSample = async (req, res) => {
+
+  try {
+
+    const booking =
+      await Booking.findById(
+        req.params.id
+      )
+
+    if (!booking) {
+
+      return res.status(404).json({
+        message: 'Booking Not Found'
+      })
+    }
+
+  booking.sampleImages =
+  req.files.map(
+    file => file.path
+  )
+
+    booking.sampleId =
+      'SMP-' +
+      Math.floor(
+        100000 +
+        Math.random() * 900000
+      )
+
+    booking.sampleCollectedAt =
+      new Date()
+
+    booking.assistantNotes =
+      req.body.assistantNotes
+
+    booking.status =
+      'Sample Collected'
+
+    await booking.save()
+
+    res.status(200).json({
+      message:
+        'Sample Uploaded Successfully',
+
+      booking
+    })
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    })
+  }
+}
+
+export const markPaymentDone =
+  async (req, res) => {
+
+    try {
+
+      const booking =
+        await Booking.findById(
+          req.params.id
+        )
+
+      if (!booking) {
+
+        return res.status(404).json({
+          message:
+            'Booking Not Found'
+        })
+      }
+
+      booking.paymentStatus =
+        'Paid'
+
+      booking.status = 'Paid'
+
+      booking.transactionId =
+        req.body.transactionId
+
+      booking.paymentAmount =
+        req.body.paymentAmount
+
+      booking.paidAt =
+        new Date()
+
+      await booking.save()
+
+      res.status(200).json({
+        message:
+          'Payment Completed'
+      })
+
+    } catch (error) {
+
+      res.status(500).json({
+        message: error.message
+      })
+    }
+  }
