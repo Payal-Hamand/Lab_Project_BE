@@ -49,14 +49,14 @@ export const createLabAssistant = async (req, res) => {
 
     // Existing User
 
-    const userExists = await User.findOne({
-      email,
-    });
-    if (userExists) {
-      return res.status(400).json({
-        message: "User Already Exists",
-      });
-    }
+    const userExists = await User.findOne({ email });
+
+if (userExists) {
+  return res.status(409).json({
+    success: false,
+    message: "User already exists"
+  });
+}
 
     // Hash Password
 
@@ -79,9 +79,10 @@ export const createLabAssistant = async (req, res) => {
       labOwner: req.user._id,
     });
     res.status(201).json({
-      message: "Lab Assistant Created Successfully",
-      user,
-    });
+  success: true,
+  message: "Lab Assistant Created Successfully",
+  user
+});
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -160,3 +161,27 @@ export const createLabOwner = async (req, res) => {
     });
   }
 };
+
+export const getLabOwners =
+async (req, res) => {
+
+  try {
+
+    const labOwners =
+      await User.find({
+
+        role: 'lab_owner'
+      })
+
+    res.status(200).json(
+      labOwners
+    )
+
+  } catch (error) {
+
+    res.status(500).json({
+      message:
+        error.message
+    })
+  }
+}

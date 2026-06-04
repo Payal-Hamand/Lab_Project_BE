@@ -7,22 +7,23 @@ dotenv.config();
 export const createBooking = async (req, res) => {
   try {
     const {
-      test,
-      patientName,
-      age,
-      gender,
-      phone,
-      flatNo,
-      landmark,
-      city,
-      pincode,
-      address,
-      bookingDate,
-      bookingTime,
-    } = req.body;
+  test,
+  package: packageId,
+  patientName,
+  age,
+  gender,
+  phone,
+  flatNo,
+  landmark,
+  city,
+  pincode,
+  address,
+  bookingDate,
+  bookingTime,
+} = req.body;
     // Empty Validation
     if (
-      !test ||
+      (!test && !packageId) ||
       !patientName ||
       !age ||
       !gender ||
@@ -94,23 +95,40 @@ export const createBooking = async (req, res) => {
       });
     }
     // Create Booking
-    const booking = await Booking.create({
-      user: req.user._id,
-      test,
-      patientName,
-      age,
-      gender,
-      phone,
-      flatNo,
-      landmark,
-      city,
-      pincode,
-      address,
-      bookingDate,
-      bookingTime,
-      labOwner: labOwner._id,
-      reportId: "REP-" + Math.floor(100000 + Math.random() * 900000),
-    });
+ const bookingData = {
+  user: req.user._id,
+  patientName,
+  age,
+  gender,
+  phone,
+  flatNo,
+  landmark,
+  city,
+  pincode,
+  address,
+  bookingDate,
+  bookingTime,
+  labOwner: labOwner._id,
+  reportId:
+    "REP-" +
+    Math.floor(
+      100000 +
+      Math.random() * 900000
+    ),
+};
+
+if (test) {
+  bookingData.test = test;
+}
+
+if (packageId) {
+  bookingData.package = packageId;
+}
+
+const booking =
+  await Booking.create(
+    bookingData
+  );
 
     res.status(201).json(booking);
   } catch (error) {
@@ -171,6 +189,7 @@ export const getAllBookings = async (req, res) => {
     const bookings = await Booking.find()
       .populate("test")
       .populate("user")
+      .populate('package')
       .populate("assignedLabAssistant", "name email")
       .populate("labOwner", "name email")
       .sort({ createdAt: -1 });
@@ -254,6 +273,7 @@ export const getAssignedBookings = async (req, res) => {
   "test",
   "title price"
 )
+.populate("package", "title price")
       .populate("user")
       .sort({
         createdAt: -1,
