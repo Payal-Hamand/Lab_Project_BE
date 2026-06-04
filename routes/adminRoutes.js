@@ -6,7 +6,8 @@ import authorizeRoles from '../middleware/roleMiddleware.js'
 
 import {
   createLabAssistant,
-  createLabOwner
+  createLabOwner,
+  getLabOwners
 } from '../controllers/adminController.js'
 
 const router = express.Router()
@@ -27,6 +28,16 @@ router.post(
   authorizeRoles('admin'),
 
   createLabOwner
+)
+router.get(
+
+  '/lab-owners',
+
+  protect,
+
+  authorizeRoles('admin'),
+
+  getLabOwners
 )
 
 export default router

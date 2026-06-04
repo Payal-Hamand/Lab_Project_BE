@@ -10,10 +10,13 @@ const bookingSchema = mongoose.Schema(
 
     test: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Test',
-      required: true
+      ref: 'Test'
     },
 
+    package: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Package'
+    },
     patientName: {
   type: String,
   required: true,
