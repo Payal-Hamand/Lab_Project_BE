@@ -81,6 +81,16 @@ pincode: {
   required: true,
   match: /^[1-9][0-9]{5}$/
 },
+location: {
+  latitude: Number,
+  longitude: Number
+},
+patientLatitude: Number,
+patientLongitude: Number,
+assignedDistance: {
+  type: Number,
+  default: 0
+},
 
     bookingDate: {
       type: String,

@@ -1,6 +1,7 @@
 import Booking from "../models/Booking.js";
 import dotenv from "dotenv";
 import User from "../models/User.js";
+import { getDistance } from 'geolib'
 
 dotenv.config();
 
@@ -20,6 +21,8 @@ export const createBooking = async (req, res) => {
   address,
   bookingDate,
   bookingTime,
+    latitude,
+  longitude
 } = req.body;
     // Empty Validation
     if (
@@ -85,37 +88,114 @@ export const createBooking = async (req, res) => {
         message: "Invalid Gender Selected",
       });
     }
-    const labOwner = await User.findOne({
-      role: "lab_owner",
-      servicePincodes: pincode,
-    });
-    if (!labOwner) {
-      return res.status(404).json({
-        message: "No Lab Available In This Area",
-      });
-    }
+   const labOwners =
+  await User.find({
+    role: 'lab_owner'
+  })
+
+if (!labOwners.length) {
+
+  return res.status(404).json({
+    message: 'No Lab Available'
+  })
+}
+
+let nearestLab = null
+
+let nearestDistance =
+  Infinity
+
+for (const lab of labOwners) {
+
+  if (
+    !lab.latitude ||
+    !lab.longitude
+  ) {
+    continue
+  }
+
+  const distance =
+    getDistance(
+
+      {
+        latitude:
+          latitude,
+        longitude:
+          longitude
+      },
+
+      {
+        latitude:
+          lab.latitude,
+        longitude:
+          lab.longitude
+      }
+
+    )
+
+  if (
+    distance <
+    nearestDistance
+  ) {
+
+    nearestDistance =
+      distance
+
+    nearestLab = lab
+  }
+}
+    if (
+  !nearestLab ||
+  nearestDistance >
+    nearestLab.serviceRadius * 1000
+) {
+
+  return res.status(404).json({
+
+    message:
+      `No Lab Available Within ${nearestLab.serviceRadius} KM`
+
+  })
+}
+nearestDistance >
+nearestLab.serviceRadius * 1000
     // Create Booking
  const bookingData = {
   user: req.user._id,
+
   patientName,
   age,
   gender,
   phone,
+
   flatNo,
   landmark,
   city,
   pincode,
   address,
+
   bookingDate,
   bookingTime,
-  labOwner: labOwner._id,
+
+  labOwner: nearestLab._id,
+
+  assignedDistance: nearestDistance,
+
+  patientLatitude: latitude,
+  patientLongitude: longitude,
+
+  location: {
+    latitude,
+    longitude
+  },
+
   reportId:
     "REP-" +
     Math.floor(
       100000 +
       Math.random() * 900000
-    ),
-};
+    )
+}
 
 if (test) {
   bookingData.test = test;
