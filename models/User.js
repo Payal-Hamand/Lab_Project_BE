@@ -42,6 +42,24 @@ const userSchema = mongoose.Schema(
 phone: {
   type: String
 },
+labAddress: {
+  type: String,
+  required: function () {
+    return this.role === 'lab_owner'
+  }
+},
+
+latitude: {
+  type: Number
+},
+
+longitude: {
+  type: Number
+},
+serviceRadius: {
+  type: Number,
+  default: 10
+},
 
 document: {
   type: String

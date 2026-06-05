@@ -102,14 +102,19 @@ export const createLabOwner = async (req, res) => {
         message: "Only Admin Can Create Lab Owners",
       });
     }
-    const {
-      name,
-      email,
-      password,
-      servicePincodes,
-    } = req.body;
+   const {
+  name,
+  email,
+  password,
+  servicePincodes,
+  labAddress,
+  latitude,
+  longitude
+} = req.body
     // Validation
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !labAddress ||
+  !latitude ||
+  !longitude) {
       return res.status(400).json({
         message: "All Fields Are Required",
       });
@@ -144,12 +149,21 @@ export const createLabOwner = async (req, res) => {
     );
     // Create Lab Owner
     const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role: "lab_owner",
-      servicePincodes: servicePincodes || [],
-    });
+
+  name,
+  email,
+
+  password:
+    hashedPassword,
+
+  role: 'lab_owner',
+
+  labAddress,
+
+  latitude,
+
+  longitude,
+})
     res.status(201).json({
       message: "Lab Owner Created Successfully",
       user,
