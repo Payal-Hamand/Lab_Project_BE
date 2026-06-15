@@ -120,7 +120,9 @@ assignedDistance: {
 
     'Report Ready',
 
-    'Completed'
+    'Completed',
+    'Cancelled',
+    'Rescheduled'
 
   ],
 
@@ -143,6 +145,24 @@ sampleCollectedAt: {
 },
 
 assistantNotes: {
+  type: String,
+  default: ''
+},
+rescheduleReason: {
+  type: String,
+  default: ''
+},
+
+rescheduledAt: {
+  type: Date
+},
+
+oldBookingDate: {
+  type: String,
+  default: ''
+},
+
+oldBookingTime: {
   type: String,
   default: ''
 },
@@ -186,6 +206,25 @@ paidAt: {
   ],
 
   default: 'Pending'
+},
+cancelledBy: {
+  type: String,
+  enum: [
+    'patient',
+    'lab_owner',
+    'admin'
+  ],
+  default: null
+},
+
+cancelReason: {
+  type: String,
+  default: ''
+},
+
+cancelledAt: {
+  type: Date,
+  default: null
 },
 
     report: {
