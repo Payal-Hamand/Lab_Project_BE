@@ -1,67 +1,3 @@
-// import express from 'express'
-
-// import protect from '../middleware/authMiddleware.js'
-
-// import upload from '../middleware/uploadMiddleware.js'
-
-// import {
-//   createBooking,
-//   getAllBookings,
-//   getMyBookings,
-//   uploadReport,
-//   getLabOwnerBookings,
-  
-// } from '../controllers/bookingController.js'
-// import authorizeRoles from '../middleware/roleMiddleware.js'
-
-// const router = express.Router()
-
-// router.post('/', protect, createBooking)
-
-// router.get('/my-bookings', protect, getMyBookings)
-
-// router.put(
-
-//   '/upload-report/:id',
-
-//   protect,
-
-//   authorizeRoles(
-//     'lab_assistant',
-//     'admin'
-//   ),
-
-//   upload.single('report'),
-
-//   uploadReport
-// )
-// router.get(
-//   '/all',
-//   protect,
-//   authorizeRoles(
-//     'admin',
-//     'lab_assistant'
-//   ),
-//   getAllBookings
-// )
-
-// router.get(
-
-//   '/lab-owner-bookings',
-
-//   protect,
-
-//   authorizeRoles(
-//     'lab_owner'
-//   ),
-
-//   getLabOwnerBookings
-// )
-
-// export default router
-
-
-
 import express from 'express'
 
 const router = express.Router()
@@ -87,7 +23,11 @@ import {
   getAssignedBookings,
   markReached,
   uploadSample,
-  markPaymentDone
+  markPaymentDone,
+   searchAssignedBookings,
+   searchLabOwnerBookings,
+   cancelBooking,
+     updateBookingRequest
 
 } from '../controllers/bookingController.js'
 
@@ -167,6 +107,18 @@ router.get(
   getAssignedBookings
 )
 
+router.get(
+  "/assigned/search",
+  protect,
+  authorizeRoles('lab_assistant'),
+  searchAssignedBookings
+);
+router.get(
+  "/lab-owner/search",
+  protect,
+  authorizeRoles('lab_owner'),
+  searchLabOwnerBookings
+);
 router.put(
 
   '/upload-report/:id',
@@ -203,4 +155,19 @@ router.put(
   markPaymentDone
 )
 
+router.put(
+  '/cancel/:id',
+  protect,
+  authorizeRoles('patient'),
+  cancelBooking
+)
+
+router.put(
+  '/manage/:id',
+  protect,
+  authorizeRoles(
+    'patient'
+  ),
+  updateBookingRequest
+)
 export default router

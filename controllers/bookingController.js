@@ -144,21 +144,14 @@ for (const lab of labOwners) {
     nearestLab = lab
   }
 }
-    if (
-  !nearestLab ||
-  nearestDistance >
-    nearestLab.serviceRadius * 1000
-) {
+const MAX_DISTANCE = 50000; // 50 km
 
+if (!nearestLab || nearestDistance > MAX_DISTANCE) {
   return res.status(404).json({
-
-    message:
-      `No Lab Available Within ${nearestLab.serviceRadius} KM`
-
-  })
+    message: "No Lab Available In Your Area"
+  });
 }
-nearestDistance >
-nearestLab.serviceRadius * 1000
+
     // Create Booking
  const bookingData = {
   user: req.user._id,
@@ -283,20 +276,61 @@ export const getAllBookings = async (req, res) => {
 
 export const getLabOwnerBookings = async (req, res) => {
   try {
+
     const bookings = await Booking.find({
-      labOwner: req.user._id,
+      labOwner: req.user._id
     })
       .populate("test")
+      .populate("package")
       .populate("user")
-      .populate("assignedLabAssistant", "name email")
-      .sort({
-        createdAt: -1,
-      });
-    res.status(200).json(bookings);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
+      .populate(
+        "assignedLabAssistant",
+        "name email"
+      );
+
+    bookings.sort((a, b) => {
+
+      const aCompleted =
+        a.status === "Completed";
+
+      const bCompleted =
+        b.status === "Completed";
+
+      if (!aCompleted && bCompleted)
+        return -1;
+
+      if (aCompleted && !bCompleted)
+        return 1;
+
+      const aDate =
+        new Date(a.bookingDate);
+
+      const bDate =
+        new Date(b.bookingDate);
+
+      if (
+        aDate.getTime() !==
+        bDate.getTime()
+      ) {
+        return aDate - bDate;
+      }
+
+      return (
+        a.bookingTime || ""
+      ).localeCompare(
+        b.bookingTime || ""
+      );
+
     });
+
+    res.status(200).json(bookings);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
   }
 };
 
@@ -346,23 +380,51 @@ export const assignAssistant = async (req, res) => {
 
 export const getAssignedBookings = async (req, res) => {
   try {
+
     const bookings = await Booking.find({
-      assignedLabAssistant: req.user._id,
+      assignedLabAssistant: req.user._id
     })
-      .populate(
-  "test",
-  "title price"
-)
-.populate("package", "title price")
-      .populate("user")
-      .sort({
-        createdAt: -1,
-      });
+      .populate("test", "title price")
+      .populate("package", "title price")
+      .populate("user");
+
+    const today = new Date();
+today.setHours(0,0,0,0);
+
+bookings.sort((a, b) => {
+
+  const aDate = new Date(a.bookingDate);
+  const bDate = new Date(b.bookingDate);
+
+  const aCompleted = a.status === "Completed";
+  const bCompleted = b.status === "Completed";
+
+  if (!aCompleted && bCompleted) return -1;
+  if (aCompleted && !bCompleted) return 1;
+
+  const aToday = aDate.getTime() === today.getTime();
+  const bToday = bDate.getTime() === today.getTime();
+
+  if (aToday && !bToday) return -1;
+  if (!aToday && bToday) return 1;
+
+  if (aDate.getTime() !== bDate.getTime()) {
+    return aDate - bDate;
+  }
+
+  return a.bookingTime.localeCompare(
+    b.bookingTime
+  );
+});
+
     res.status(200).json(bookings);
+
   } catch (error) {
+
     res.status(500).json({
-      message: error.message,
+      message: error.message
     });
+
   }
 };
 
@@ -416,6 +478,16 @@ export const uploadSample = async (req, res) => {
         message: 'Booking Not Found'
       })
     }
+
+    if (
+  !req.files ||
+  req.files.length === 0
+) {
+  return res.status(400).json({
+    message:
+      "Please upload at least one sample image"
+  });
+}
 
   booking.sampleImages =
   req.files.map(
@@ -501,3 +573,347 @@ export const markPaymentDone =
       })
     }
   }
+
+ export const searchAssignedBookings = async (req, res) => {
+  try {
+    const { search = "" } = req.query;
+
+    const bookings = await Booking.find({
+      assignedLabAssistant: req.user._id
+    })
+      .populate("test", "title price")
+      .populate("package", "title price")
+      .populate("user");
+
+    const filteredBookings = bookings.filter((booking) => {
+
+      const searchText = search.toLowerCase();
+
+      return (
+        booking.patientName?.toLowerCase().includes(searchText) ||
+        booking.phone?.includes(search) ||
+        booking.test?.title?.toLowerCase().includes(searchText) ||
+        booking.package?.title?.toLowerCase().includes(searchText)
+      );
+    });
+
+    res.status(200).json(filteredBookings);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+};
+export const searchLabOwnerBookings =
+  async (req, res) => {
+
+    try {
+
+      const { search = "" } =
+        req.query;
+
+      const bookings =
+        await Booking.find({
+          labOwner: req.user._id
+        })
+          .populate(
+            "test",
+            "title price"
+          )
+          .populate(
+            "package",
+            "title price"
+          )
+          .populate(
+            "user"
+          )
+          .populate(
+            "assignedLabAssistant",
+            "name email"
+          );
+
+      const searchText =
+        search.toLowerCase();
+
+      const filtered =
+        bookings.filter(
+          (booking) => {
+
+            return (
+
+              booking.patientName
+                ?.toLowerCase()
+                .includes(searchText)
+
+              ||
+
+              booking.phone
+                ?.includes(search)
+
+              ||
+
+              booking.test?.title
+                ?.toLowerCase()
+                .includes(searchText)
+
+              ||
+
+              booking.package?.title
+                ?.toLowerCase()
+                .includes(searchText)
+
+              ||
+
+              booking
+                .assignedLabAssistant
+                ?.name
+                ?.toLowerCase()
+                .includes(searchText)
+
+            );
+
+          }
+        );
+
+      res.status(200).json(
+        filtered
+      );
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          error.message
+      });
+
+    }
+
+  };
+
+  export const cancelBooking =
+  async (req, res) => {
+
+    try {
+
+      const {
+        reason
+      } = req.body
+
+      if (!reason) {
+
+        return res.status(400).json({
+          message:
+            'Cancellation reason is required'
+        })
+      }
+
+      const booking =
+        await Booking.findById(
+          req.params.id
+        )
+
+      if (!booking) {
+
+        return res.status(404).json({
+          message:
+            'Booking Not Found'
+        })
+      }
+
+      // Only patient can cancel own booking
+
+      if (
+        booking.user.toString() !==
+        req.user._id.toString()
+      ) {
+
+        return res.status(403).json({
+          message:
+            'Unauthorized'
+        })
+      }
+
+      // Cannot cancel completed booking
+
+      if (
+        booking.status ===
+        'Completed'
+      ) {
+
+        return res.status(400).json({
+          message:
+            'Completed booking cannot be cancelled'
+        })
+      }
+
+      booking.status =
+        'Cancelled'
+
+      booking.cancelReason =
+        reason
+
+      booking.cancelledBy =
+        'patient'
+
+      booking.cancelledAt =
+        new Date()
+
+      await booking.save()
+
+      res.status(200).json({
+        message:
+          'Booking Cancelled Successfully'
+      })
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          error.message
+      })
+
+    }
+  }
+  export const updateBookingRequest =
+async (req, res) => {
+
+  try {
+
+    const {
+      action,
+      reason,
+      bookingDate,
+      bookingTime
+    } = req.body
+
+    const booking =
+      await Booking.findById(
+        req.params.id
+      )
+
+    if (!booking) {
+
+      return res.status(404).json({
+        message:
+          'Booking Not Found'
+      })
+    }
+
+    if (
+      booking.user.toString() !==
+      req.user._id.toString()
+    ) {
+
+      return res.status(403).json({
+        message:
+          'Unauthorized'
+      })
+    }
+
+    if (
+      booking.status ===
+      'Completed'
+    ) {
+
+      return res.status(400).json({
+        message:
+          'Completed booking cannot be modified'
+      })
+    }
+
+    // Cancel
+
+    if (
+      action === 'cancel'
+    ) {
+
+      if (!reason) {
+
+        return res.status(400).json({
+          message:
+            'Cancellation reason required'
+        })
+      }
+
+      booking.status =
+        'Cancelled'
+
+      booking.cancelReason =
+        reason
+
+      booking.cancelledBy =
+        'patient'
+
+      booking.cancelledAt =
+        new Date()
+
+      await booking.save()
+
+      return res.status(200).json({
+        message:
+          'Booking Cancelled Successfully'
+      })
+    }
+
+    // Reschedule
+
+    if (
+      action === 'reschedule'
+    ) {
+
+      if (
+        !bookingDate ||
+        !bookingTime
+      ) {
+
+        return res.status(400).json({
+          message:
+            'New Date and Time Required'
+        })
+      }
+
+      booking.oldBookingDate =
+        booking.bookingDate
+
+      booking.oldBookingTime =
+        booking.bookingTime
+
+      booking.bookingDate =
+        bookingDate
+
+      booking.bookingTime =
+        bookingTime
+
+      booking.rescheduleReason =
+        reason || ''
+
+      booking.rescheduledAt =
+        new Date()
+
+      booking.status =
+        'Rescheduled'
+
+      await booking.save()
+
+      return res.status(200).json({
+        message:
+          'Booking Rescheduled Successfully'
+      })
+    }
+
+    res.status(400).json({
+      message:
+        'Invalid Action'
+    })
+
+  } catch (error) {
+
+    res.status(500).json({
+      message:
+        error.message
+    })
+  }
+}
