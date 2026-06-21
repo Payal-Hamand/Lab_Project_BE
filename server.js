@@ -15,6 +15,7 @@ import adminRoutes from './routes/adminRoutes.js'
 import adminSetupRoute from './routes/adminSetupRoute.js'
 import userRoutes from './routes/userRoutes.js'
 import paymentRoutes from './routes/paymentRoutes.js';
+import forgotePasswordRoute from './routes/forgotePasswordRoute.js'
 
 
 connectDB()
@@ -63,6 +64,7 @@ app.use(
   "/api/payment",
   paymentRoutes
 );
+app.use("/api/pass", forgotePasswordRoute)
 app.get('/', (req, res) => {
   res.send('API Running...')
 })
