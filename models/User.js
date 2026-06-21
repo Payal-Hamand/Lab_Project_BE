@@ -71,6 +71,14 @@ servicePincodes: {
   default: []
 
 },
+resetOtp: {
+  type: String,
+  default: ''
+},
+
+resetOtpExpire: {
+  type: Date
+}
   },
   
   {
