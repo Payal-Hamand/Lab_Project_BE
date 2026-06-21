@@ -1,5 +1,5 @@
 import User from '../models/User.js'
-import sendMail from '../utils/sendMail.js'
+import sendMail from "../Utils/sendMail.js"
 import bcrypt from 'bcryptjs'
 
 export const forgotPassword =
