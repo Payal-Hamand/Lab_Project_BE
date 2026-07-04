@@ -40,7 +40,7 @@ const protect = async (
           decoded.id
         ).select('-password')
 
-        console.log('Decoded User ID:', user)
+       
       // IMPORTANT
 
       if (!user) {
