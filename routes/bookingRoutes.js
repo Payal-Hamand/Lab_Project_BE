@@ -27,7 +27,9 @@ import {
    searchAssignedBookings,
    searchLabOwnerBookings,
    cancelBooking,
-     updateBookingRequest
+     updateBookingRequest,
+       updateBookingLab,
+       getAllLabOwners
 
 } from '../controllers/bookingController.js'
 
@@ -82,6 +84,21 @@ router.get(
 )
 
 router.put(
+  "/update-booking-lab/:bookingId",
+  protect,
+  
+  authorizeRoles('admin'),
+  updateBookingLab
+);
+
+router.get(
+  "/lab-owners",
+  protect,
+  authorizeRoles('admin'),
+  getAllLabOwners
+);
+
+router.put(
 
   '/assign-assistant',
 
@@ -126,7 +143,7 @@ router.put(
   protect,
 
   authorizeRoles(
-    'lab_assistant'
+    'lab_owner'
   ),
 
   upload.single('report'),

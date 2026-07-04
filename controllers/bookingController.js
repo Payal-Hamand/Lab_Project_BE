@@ -265,7 +265,7 @@ export const getAllBookings = async (req, res) => {
       .populate("user")
       .populate('package')
       .populate("assignedLabAssistant", "name email")
-      .populate("labOwner", "name email")
+      .populate("labOwner", "name email labAddress")
       .sort({ createdAt: -1 });
     res.status(200).json(bookings);
   } catch (error) {
@@ -918,3 +918,82 @@ async (req, res) => {
     })
   }
 }
+
+
+export const updateBookingLab = async (req, res) => {
+  try {
+    // Only Admin can update
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Only Admin Can Update Lab"
+      });
+    }
+
+    const { bookingId } = req.params;
+    const { labOwnerId } = req.body;
+
+    // Check booking exists
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking Not Found"
+      });
+    }
+
+    // Check Lab Owner exists
+    const labOwner = await User.findOne({
+      _id: labOwnerId,
+      role: "lab_owner"
+    });
+
+    if (!labOwner) {
+      return res.status(404).json({
+        message: "Lab Owner Not Found"
+      });
+    }
+
+    booking.labOwner = labOwnerId;
+
+    // Optional: remove assigned assistant when lab changes
+    booking.assignedLabAssistant = null;
+
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Lab Assigned Successfully",
+      booking
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error"
+    });
+  }
+};
+
+export const getAllLabOwners = async (req, res) => {
+  try {
+
+    const labOwners =
+      await User.find({
+        role: "lab_owner"
+      }).select(
+        "name email labAddress"
+      );
+
+    res.status(200).json(
+      labOwners
+    );
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Server Error"
+    });
+
+  }
+};
