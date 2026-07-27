@@ -1,4 +1,4 @@
-import PaymentSetting from "../models/PaymentSetting.js";
+import PaymentSetting from "../models/paymentSetting.js";
 
 
 // Create Payment Setting (Only Once)
