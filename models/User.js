@@ -12,7 +12,11 @@ const userSchema = mongoose.Schema(
       required: true,
       unique: true
     },
-
+phone: {
+  type: String,
+  required: true,
+    
+},
     password: {
       type: String,
       required: true
@@ -39,9 +43,7 @@ const userSchema = mongoose.Schema(
   default: null
 
 },
-phone: {
-  type: String
-},
+
 labAddress: {
   type: String,
   required: function () {
