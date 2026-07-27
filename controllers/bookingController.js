@@ -527,53 +527,67 @@ export const uploadSample = async (req, res) => {
     })
   }
 }
+export const markPaymentDone = async (req, res) => {
 
-export const markPaymentDone =
-  async (req, res) => {
+  try {
 
-    try {
+    const booking =
+      await Booking.findById(req.params.id);
 
-      const booking =
-        await Booking.findById(
-          req.params.id
-        )
+    if (!booking) {
 
-      if (!booking) {
+      return res.status(404).json({
+        message: "Booking Not Found"
+      });
 
-        return res.status(404).json({
-          message:
-            'Booking Not Found'
-        })
-      }
-
-      booking.paymentStatus =
-        'Paid'
-
-      booking.status = 'Paid'
-
-      booking.transactionId =
-        req.body.transactionId
-
-      booking.paymentAmount =
-        req.body.paymentAmount
-
-      booking.paidAt =
-        new Date()
-
-      await booking.save()
-
-      res.status(200).json({
-        message:
-          'Payment Completed'
-      })
-
-    } catch (error) {
-
-      res.status(500).json({
-        message: error.message
-      })
     }
+
+    if (!req.file) {
+
+      return res.status(400).json({
+        message: "Please upload payment receipt."
+      });
+
+    }
+
+    booking.paymentScreenshot =
+      req.file.path;
+
+    booking.paymentStatus =
+      "Paid";
+
+    booking.paidAt =
+      new Date();
+
+    booking.status =
+      "Processing";
+
+    await booking.save();
+
+    res.status(200).json({
+
+      success: true,
+
+      message:
+        "Payment completed successfully.",
+
+      booking
+
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message: error.message
+
+    });
+
   }
+
+};
 
  export const searchAssignedBookings = async (req, res) => {
   try {

@@ -166,11 +166,13 @@ router.put(
   uploadSample
 )
 
+
 router.put(
-  '/payment/:id',
+  "/payment/:id",
   protect,
+  upload.single("receipt"),
   markPaymentDone
-)
+);
 
 router.put(
   '/cancel/:id',

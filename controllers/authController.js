@@ -20,15 +20,24 @@ export const registerUser = async (req, res) => {
     const {
       name,
       email,
-      password
+      password,
+      phone
     } = req.body
 
-    const userExists = await User.findOne({ email })
-
-    if (userExists) {
+    if (!name || !email || !password || !phone) {
 
       return res.status(400).json({
-        message: 'User already exists'
+        message: 'Please fill all fields'
+      })
+    }
+
+    const userExists = await User.findOne({ email })
+    const phoneExists = await User.findOne({ phone })
+
+    if (userExists || phoneExists) {
+
+      return res.status(400).json({
+        message: 'User or phone number already exists'
       })
     }
 
@@ -42,7 +51,8 @@ export const registerUser = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      phone
     })
 
     res.status(201).json({
@@ -50,6 +60,7 @@ export const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      phone: user.phone,
       token: generateToken(user._id)
     })
 
