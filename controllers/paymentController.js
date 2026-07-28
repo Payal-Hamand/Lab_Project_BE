@@ -15,16 +15,11 @@
           mobileNumber,
         } = req.body;
 
-        
-
         const merchantTransactionId =
           "T" + Date.now();
 
-          await Booking.findByIdAndUpdate(
-
-    bookingId,
-
-    {
+          await Booking.findByIdAndUpdate( bookingId,
+            {
       transactionId:
         merchantTransactionId,
     }

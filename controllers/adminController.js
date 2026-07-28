@@ -2,9 +2,6 @@ import User from "../models/User.js";
 
 import bcrypt from "bcryptjs";
 
-/* -----------------------------------------
-   CREATE LAB ASSISTANT
------------------------------------------- */
 
 export const createLabAssistant = async (req, res) => {
   try {
