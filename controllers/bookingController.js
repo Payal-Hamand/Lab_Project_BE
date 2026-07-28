@@ -622,6 +622,7 @@ export const markPaymentDone = async (req, res) => {
 
   }
 };
+
 export const searchLabOwnerBookings =
   async (req, res) => {
 

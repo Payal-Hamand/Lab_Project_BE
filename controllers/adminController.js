@@ -30,15 +30,11 @@ export const createLabAssistant = async (req, res) => {
       });
     }
 
-    // Password Length
-
     if (password.length < 6) {
       return res.status(400).json({
         message: "Password Must Be At Least 6 Characters",
       });
     }
-
-    // Email Validation
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -46,8 +42,6 @@ export const createLabAssistant = async (req, res) => {
         message: "Invalid Email Format",
       });
     }
-
-    // Existing User
 
     const userExists = await User.findOne({ email });
 
@@ -57,16 +51,12 @@ if (userExists) {
     message: "User already exists"
   });
 }
-
-    // Hash Password
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(
       password,
       salt,
     );
 
-    // Create Assistant
 
     const user = await User.create({
       name,
