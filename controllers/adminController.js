@@ -15,13 +15,13 @@ export const createLabAssistant = async (req, res) => {
       name,
       email,
       password,
-      mobile,
+      phone,
       documents,
     } = req.body;
 
     // Validation
 
-    if (!name || !email || !password || !mobile) {
+    if (!name || !email || !password || !phone) {
       return res.status(400).json({
         message: "All Fields Are Required",
       });
@@ -58,7 +58,7 @@ if (userExists) {
     const user = await User.create({
       name,
       email,
-      mobile,
+      phone,
       documents,
       password: hashedPassword,
       role: "lab_assistant",
@@ -92,6 +92,7 @@ export const createLabOwner = async (req, res) => {
    const {
   name,
   email,
+  phone,
   password,
   servicePincodes,
   labAddress,
@@ -99,7 +100,7 @@ export const createLabOwner = async (req, res) => {
   longitude
 } = req.body
     // Validation
-    if (!name || !email || !password || !labAddress ||
+    if (!name || !email || !password || !phone || !labAddress ||
   !latitude ||
   !longitude) {
       return res.status(400).json({
@@ -128,6 +129,15 @@ export const createLabOwner = async (req, res) => {
         message: "User Already Exists",
       });
     }
+    const phoneExists = await User.findOne({
+      phone,
+    });
+    if (phoneExists) {
+      return res.status(400).json({
+        message: "Phone Number Already Exists",
+      });
+    }
+
     // Hash Password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(
@@ -139,6 +149,7 @@ export const createLabOwner = async (req, res) => {
 
   name,
   email,
+  phone,
 
   password:
     hashedPassword,

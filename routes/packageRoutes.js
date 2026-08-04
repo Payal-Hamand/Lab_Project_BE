@@ -1,22 +1,42 @@
-import express from 'express'
+import express from "express";
 
 import {
   createPackage,
-  getAllPackages
-} from '../controllers/packageController.js'
+  getAllPackages,
+  getSinglePackage,
+  updatePackage,
+  deletePackage,
+} from "../controllers/packageController.js";
 
-import protect from '../middleware/authMiddleware.js'
+import protect from "../middleware/authMiddleware.js";
+import authorizeRoles from "../middleware/roleMiddleware.js";
 
-import authorizeRoles from '../middleware/roleMiddleware.js'
+const router = express.Router();
 
-const router = express.Router()
+// Public Routes
+router.get("/", getAllPackages);
+router.get("/:id", getSinglePackage);
 
-router.get('/', getAllPackages)
-
+// Admin Routes
 router.post(
-  '/',
-
+  "/",
+  protect,
+  authorizeRoles("admin"),
   createPackage
-)
+);
 
-export default router
+router.put(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  updatePackage
+);
+
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  deletePackage
+);
+
+export default router;

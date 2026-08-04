@@ -19,6 +19,8 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import forgotePasswordRoute from "./routes/forgotePasswordRoute.js";
 import paymentSettingRoutes from "./routes/paymentSettingRoutes.js";
 
+import paymentStatisticRoutes from "./routes/paymentStatistic.js";
+
 const app = express();
 
 /* ---------- Database ---------- */
@@ -69,6 +71,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/pass", forgotePasswordRoute);
 app.use("/api/payment-setting", paymentSettingRoutes);
+app.use("/api/payment-stats", paymentStatisticRoutes);
 
 /* ---------- 404 ---------- */
 
