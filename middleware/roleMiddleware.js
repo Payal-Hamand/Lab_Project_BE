@@ -20,6 +20,9 @@ const authorizeRoles =
           req.user.role
         )
       ) {
+        console.log(
+          `Access Denied: User role ${req.user.role} is not authorized to access this route.`
+        )
 
         return res.status(403).json({
 

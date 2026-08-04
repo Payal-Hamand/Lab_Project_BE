@@ -15,16 +15,11 @@
           mobileNumber,
         } = req.body;
 
-        
-
         const merchantTransactionId =
           "T" + Date.now();
 
-          await Booking.findByIdAndUpdate(
-
-    bookingId,
-
-    {
+          await Booking.findByIdAndUpdate( bookingId,
+            {
       transactionId:
         merchantTransactionId,
     }
@@ -210,7 +205,6 @@ console.log(
  `${process.env.FRONT_END_URL}/lab-assistant?payment=success&t=${Date.now()}`
 );
     }
-
     // FAILED
     if (
       paymentState === "FAILED" ||
@@ -218,9 +212,7 @@ console.log(
     ) {
 
       booking.paymentStatus = "Failed";
-
       await booking.save();
-
       return res.redirect(
         `${process.env.FRONT_END_URL}/lab-assistant?payment=failed`
       );
@@ -228,19 +220,15 @@ console.log(
 
     // PENDING
     booking.paymentStatus = "Pending";
-
     await booking.save();
-
     return res.redirect(
       `${process.env.FRONT_END_URL}/lab-assistant?payment=pending`
     );
 
   } catch (error) {
-
     console.log(
       error.response?.data || error.message
     );
-
     return res.redirect(
       `${process.env.FRONT_END_URL}/lab-assistant?payment=error`
     );

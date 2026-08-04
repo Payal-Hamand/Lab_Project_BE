@@ -37,6 +37,7 @@ router.get('/create-admin', async (
     await User.create({
 
       name: 'Super Admin',
+      phone: '0000000000',
 
       email: 'admin@gmail.com',
 

@@ -1,26 +1,42 @@
-import express from 'express'
+import express from "express";
 
-import protect from '../middleware/authMiddleware.js'
-
-import authorizeRoles from '../middleware/roleMiddleware.js'
+import protect from "../middleware/authMiddleware.js";
+import authorizeRoles from "../middleware/roleMiddleware.js";
 
 import {
   createTest,
   getAllTests,
-  getSingleTest
-} from '../controllers/testController.js'
+  getSingleTest,
+  updateTest,
+  deleteTest,
+} from "../controllers/testController.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/', getAllTests)
+// Public Routes
+router.get("/", getAllTests);
+router.get("/:id", getSingleTest);
 
-router.get('/:id', getSingleTest)
-
+// Admin Routes
 router.post(
-  '/',
+  "/",
   protect,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   createTest
-)
+);
 
-export default router
+router.put(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  updateTest
+);
+
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  deleteTest
+);
+
+export default router;
