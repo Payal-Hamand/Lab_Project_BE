@@ -71,7 +71,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/pass", forgotePasswordRoute);
 app.use("/api/payment-setting", paymentSettingRoutes);
-app.use("/api/payment-stats", paymentStatisticRoutes);
+app.use("/api/payment-statistic", paymentStatisticRoutes);
 
 /* ---------- 404 ---------- */
 

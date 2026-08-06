@@ -622,8 +622,6 @@ export const markPaymentDone = async (req, res) => {
 
   }
 };
-
-
 export const searchLabOwnerBookings =
   async (req, res) => {
 
@@ -794,9 +792,8 @@ export const searchLabOwnerBookings =
 
     }
   }
-
-export const updateBookingRequest =
-  async (req, res) => {
+  export const updateBookingRequest =
+async (req, res) => {
 
   try {
 
@@ -1010,150 +1007,6 @@ export const getAllLabOwners = async (req, res) => {
 
     res.status(500).json({
       message: "Server Error"
-    });
-
-  }
-};
-
-export const getSingleBooking = async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.id)
-      .populate("user")
-      .populate("test")
-      .populate("package")
-      .populate("labOwner", "name email")
-      .populate("assignedLabAssistant", "name email");
-
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        message: "Booking Not Found"
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: booking
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-
-export const updateBooking = async (req, res) => {
-
-  try {
-
-    const booking =
-      await Booking.findById(req.params.id);
-
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        message: "Booking Not Found"
-      });
-    }
-
-    const {
-      patientName,
-      age,
-      gender,
-      phone,
-      address,
-      flatNo,
-      landmark,
-      city,
-      pincode,
-      bookingDate,
-      bookingTime,
-      status
-    } = req.body;
-
-    booking.patientName =
-      patientName ?? booking.patientName;
-
-    booking.age =
-      age ?? booking.age;
-
-    booking.gender =
-      gender ?? booking.gender;
-
-    booking.phone =
-      phone ?? booking.phone;
-
-    booking.address =
-      address ?? booking.address;
-
-    booking.flatNo =
-      flatNo ?? booking.flatNo;
-
-    booking.landmark =
-      landmark ?? booking.landmark;
-
-    booking.city =
-      city ?? booking.city;
-
-    booking.pincode =
-      pincode ?? booking.pincode;
-
-    booking.bookingDate =
-      bookingDate ?? booking.bookingDate;
-
-    booking.bookingTime =
-      bookingTime ?? booking.bookingTime;
-
-    booking.status =
-      status ?? booking.status;
-
-    await booking.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Booking Updated Successfully",
-      booking
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-
-  }
-};
-
-export const deleteBooking = async (req, res) => {
-
-  try {
-
-    const booking =
-      await Booking.findById(req.params.id);
-
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        message: "Booking Not Found"
-      });
-    }
-
-    await booking.deleteOne();
-
-    res.status(200).json({
-      success: true,
-      message: "Booking Deleted Successfully"
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: error.message
     });
 
   }
