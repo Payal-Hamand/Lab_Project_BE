@@ -1,11 +1,15 @@
-
 import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+
 
 import connectDB from "./config/db.js";
+import { seedRoles } from "./seeder/roleSeeder.js";
+import { seedSuperAdmin } from "./seeder/userSeeder.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
@@ -16,18 +20,81 @@ import adminRoutes from "./routes/adminRoutes.js";
 import adminSetupRoute from "./routes/adminSetupRoute.js";
 import userRoutes from "./routes/userRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
-import forgotePasswordRoute from "./routes/forgotePasswordRoute.js";
+import forgotPasswordRoute from "./routes/forgotPasswordRoute.js";
 import paymentSettingRoutes from "./routes/paymentSettingRoutes.js";
-
+import commissionRoutes from "./routes/commissionRoutes.js";
 import paymentStatisticRoutes from "./routes/paymentStatistic.js";
+import exportSettlementHistoryRoute from "./routes/exportSettlementHistoryRoute.js";
+import paymentSettlementRoute from "./routes/paymentSettlementRoute.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import subcategoryRoutes from "./routes/subcategoryRoutes.js";
+import roleRoutes from "./routes/roleRoutes.js";
+
+/* ---------- Env Validation ---------- */
+
+const requiredEnvVars = ["MONGO_URI", "JWT_SECRET", "SALT_KEY", "MERCHANT_ID"];
+
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`Missing required environment variable: ${envVar}`);
+    process.exit(1);
+  }
+}
 
 const app = express();
 
 /* ---------- Database ---------- */
 
 await connectDB();
+await seedRoles();
+await seedSuperAdmin();
 
-/* ---------- Middleware ---------- */
+/* ---------- Security Middleware ---------- */
+
+app.use(helmet());
+
+/* ---------- Custom Mongo Sanitize ---------- */
+const sanitize = (obj) => {
+  if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+    for (const key of Object.keys(obj)) {
+      if (key.startsWith("$") || key.includes(".")) {
+        delete obj[key];
+      } else {
+        sanitize(obj[key]);
+      }
+    }
+  }
+  if (Array.isArray(obj)) {
+    obj.forEach((item) => sanitize(item));
+  }
+};
+
+app.use((req, res, next) => {
+  sanitize(req.body);
+  sanitize(req.params);
+  next();
+});
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many requests, please try again later" },
+});
+app.use("/api/", limiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many auth attempts, please try again later" },
+});
+app.use("/api/auth/", authLimiter);
+app.use("/api/pass/", authLimiter);
+
+/* ---------- CORS ---------- */
 
 const allowedOrigins = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(",").map((url) => url.trim())
@@ -46,8 +113,10 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+/* ---------- Body Parsing ---------- */
+
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 /* ---------- Health ---------- */
 
@@ -62,6 +131,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/setup", adminSetupRoute);
 app.use("/api/auth", authRoutes);
+app.use("/api/roles", roleRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/users", userRoutes);
@@ -69,9 +139,14 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/packages", packageRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/payment", paymentRoutes);
-app.use("/api/pass", forgotePasswordRoute);
+app.use("/api/pass", forgotPasswordRoute);
 app.use("/api/payment-setting", paymentSettingRoutes);
 app.use("/api/payment-statistic", paymentStatisticRoutes);
+app.use("/api/commission", commissionRoutes);
+app.use("/api/export", exportSettlementHistoryRoute);
+app.use("/api/payment-settlement", paymentSettlementRoute);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/subcategories", subcategoryRoutes);
 
 /* ---------- 404 ---------- */
 
@@ -87,10 +162,25 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error(err);
 
+  const message =
+    process.env.NODE_ENV === "production"
+      ? "Internal Server Error"
+      : err.message || "Internal Server Error";
+
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || "Internal Server Error",
+    message,
   });
+});
+
+/* ---------- Process Error Handlers ---------- */
+
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err.message);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err.message);
 });
 
 /* ---------- Server ---------- */
@@ -98,7 +188,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
 export default app;
