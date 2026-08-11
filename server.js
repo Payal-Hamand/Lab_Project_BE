@@ -9,7 +9,7 @@ import rateLimit from "express-rate-limit";
 
 import connectDB from "./config/db.js";
 import { seedRoles } from "./seeder/roleSeeder.js";
-import { seedSuperAdmin } from "./seeder/userSeeder.js";
+import { seedAdmin } from "./seeder/userSeeder.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
@@ -47,7 +47,7 @@ const app = express();
 
 await connectDB();
 await seedRoles();
-await seedSuperAdmin();
+await seedAdmin();
 
 /* ---------- Security Middleware ---------- */
 

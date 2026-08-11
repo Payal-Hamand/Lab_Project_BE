@@ -2,32 +2,13 @@ import Role from "../models/Role.js";
 
 const defaultRoles = [
   {
-    name: "super_admin",
-    displayName: "Super Admin",
-    description: "Full access to all system features",
+    name: "admin",
+    displayName: "Admin",
+    description: "System administrator with full access to all features",
     isSystem: true,
     permissions: {
       users: { create: true, read: true, update: true, delete: true },
       roles: { create: true, read: true, update: true, delete: true },
-      bookings: { create: true, read: true, update: true, delete: true },
-      tests: { create: true, read: true, update: true, delete: true },
-      packages: { create: true, read: true, update: true, delete: true },
-      categories: { create: true, read: true, update: true, delete: true },
-      subcategories: { create: true, read: true, update: true, delete: true },
-      payments: { create: true, read: true, update: true, delete: true },
-      reports: { create: true, read: true, update: true, delete: true },
-      commissions: { create: true, read: true, update: true, delete: true },
-      settlements: { create: true, read: true, update: true, delete: true },
-      paymentSettings: { create: true, read: true, update: true, delete: true },
-    },
-  },
-  {
-    name: "admin",
-    displayName: "Admin",
-    description: "System administrator with full management access",
-    isSystem: true,
-    permissions: {
-      users: { create: true, read: true, update: true, delete: true },
       bookings: { create: true, read: true, update: true, delete: true },
       tests: { create: true, read: true, update: true, delete: true },
       packages: { create: true, read: true, update: true, delete: true },

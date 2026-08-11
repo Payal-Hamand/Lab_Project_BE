@@ -1,34 +1,34 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 
-const defaultSuperAdmin = {
-  name: "Super Admin",
+const defaultAdmin = {
+  name: "Admin",
   email: "admin@labbook.com",
   phone: "9999999999",
   password: "Admin@123",
-  role: "super_admin",
+  role: "admin",
 };
 
-export const seedSuperAdmin = async () => {
+export const seedAdmin = async () => {
   try {
-    const exists = await User.findOne({ role: "super_admin" });
+    const exists = await User.findOne({ role: "admin" });
     if (exists) {
-      console.log("Super admin user already exists, skipping seed");
+      console.log("Admin user already exists, skipping seed");
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(defaultSuperAdmin.password, 10);
+    const hashedPassword = await bcrypt.hash(defaultAdmin.password, 10);
 
     await User.create({
-      name: defaultSuperAdmin.name,
-      email: defaultSuperAdmin.email,
-      phone: defaultSuperAdmin.phone,
+      name: defaultAdmin.name,
+      email: defaultAdmin.email,
+      phone: defaultAdmin.phone,
       password: hashedPassword,
-      role: defaultSuperAdmin.role,
+      role: defaultAdmin.role,
     });
 
-    console.log(`Super admin seeded: ${defaultSuperAdmin.email}`);
+    console.log(`Admin seeded: ${defaultAdmin.email}`);
   } catch (error) {
-    console.error("Error seeding super admin:", error.message);
+    console.error("Error seeding admin:", error.message);
   }
 };
