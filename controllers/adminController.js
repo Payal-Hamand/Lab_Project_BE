@@ -5,12 +5,6 @@ import bcrypt from "bcryptjs";
 
 export const createLabAssistant = async (req, res) => {
   try {
-    // Only Lab Owner
-    if (req.user.role !== "lab_owner") {
-      return res.status(403).json({
-        message: "Only Lab Owners Can Create Assistants",
-      });
-    }
     const {
       name,
       email,
@@ -41,13 +35,20 @@ export const createLabAssistant = async (req, res) => {
     }
 
     const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists"
+      });
+    }
 
-if (userExists) {
-  return res.status(409).json({
-    success: false,
-    message: "User already exists"
-  });
-}
+    const phoneExists = await User.findOne({ phone });
+    if (phoneExists) {
+      return res.status(409).json({
+        success: false,
+        message: "Phone number already exists"
+      });
+    }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(
       password,
@@ -62,14 +63,16 @@ if (userExists) {
       documents,
       password: hashedPassword,
       role: "lab_assistant",
-      // IMPORTANT
       labOwner: req.user._id,
     });
+
+    const { password: _, ...userWithoutPassword } = user.toObject();
+
     res.status(201).json({
-  success: true,
-  message: "Lab Assistant Created Successfully",
-  user
-});
+      success: true,
+      message: "Lab Assistant Created Successfully",
+      user: userWithoutPassword,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -83,12 +86,6 @@ if (userExists) {
 ------------------------------------------ */
 export const createLabOwner = async (req, res) => {
   try {
-    // Only Admin
-    if (req.user.role !== "admin") {
-      return res.status(403).json({
-        message: "Only Admin Can Create Lab Owners",
-      });
-    }
    const {
   name,
   email,
@@ -146,25 +143,22 @@ export const createLabOwner = async (req, res) => {
     );
     // Create Lab Owner
     const user = await User.create({
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+      role: "lab_owner",
+      labAddress,
+      latitude,
+      longitude,
+    });
 
-  name,
-  email,
-  phone,
+    const { password: _, ...userWithoutPassword } = user.toObject();
 
-  password:
-    hashedPassword,
-
-  role: 'lab_owner',
-
-  labAddress,
-
-  latitude,
-
-  longitude,
-})
     res.status(201).json({
+      success: true,
       message: "Lab Owner Created Successfully",
-      user,
+      user: userWithoutPassword,
     });
   } catch (error) {
     console.log(error);
@@ -179,15 +173,12 @@ async (req, res) => {
 
   try {
 
-    const labOwners =
-      await User.find({
+    const labOwners = await User.find({ role: "lab_owner" }).select("-password");
 
-        role: 'lab_owner'
-      })
-
-    res.status(200).json(
-      labOwners
-    )
+    res.status(200).json({
+      success: true,
+      labOwners,
+    });
 
   } catch (error) {
 
