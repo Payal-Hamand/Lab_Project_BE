@@ -4,6 +4,8 @@ import User from "../models/User.js";
 import Test from "../models/Test.js";
 import { getDistance } from "geolib";
 import crypto from "crypto";
+import logger from "../Utils/logger.js";
+import MESSAGES from "../Utils/messages.js";
 
 export const createBooking = async (req, res) => {
   try {
@@ -94,38 +96,27 @@ export const createBooking = async (req, res) => {
 
     const labOwners = await User.find({ role: "lab_owner" });
 
-    if (!labOwners.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No Lab Available",
-      });
-    }
-
     let nearestLab = null;
     let nearestDistance = Infinity;
+    const MAX_DISTANCE = 10000;
 
-    for (const lab of labOwners) {
-      if (!lab.latitude || !lab.longitude) continue;
+    if (labOwners.length) {
+      for (const lab of labOwners) {
+        if (!lab.latitude || !lab.longitude) continue;
 
-      const distance = getDistance(
-        { latitude, longitude },
-        { latitude: lab.latitude, longitude: lab.longitude }
-      );
+        const distance = getDistance(
+          { latitude, longitude },
+          { latitude: lab.latitude, longitude: lab.longitude }
+        );
 
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestLab = lab;
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestLab = lab;
+        }
       }
     }
 
-    const MAX_DISTANCE = 50000;
-
-    if (!nearestLab || nearestDistance > MAX_DISTANCE) {
-      return res.status(404).json({
-        success: false,
-        message: "No Lab Available In Your Area",
-      });
-    }
+    const labFound = nearestLab && nearestDistance <= MAX_DISTANCE;
 
     const bookingData = {
       user: req.user._id,
@@ -140,8 +131,8 @@ export const createBooking = async (req, res) => {
       address,
       bookingDate,
       bookingTime,
-      labOwner: nearestLab._id,
-      assignedDistance: nearestDistance,
+      labOwner: labFound ? nearestLab._id : null,
+      assignedDistance: labFound ? nearestDistance : 0,
       patientLatitude: latitude,
       patientLongitude: longitude,
       location: { latitude, longitude },
@@ -170,6 +161,9 @@ export const createBooking = async (req, res) => {
 
     res.status(201).json({
       success: true,
+      message: labFound
+        ? "Booking Created Successfully"
+        : "Booking Created Successfully. No lab found within 10 km. We will assign a lab.",
       booking,
     });
   } catch (error) {
@@ -771,6 +765,13 @@ export const updateBookingLab = async (req, res) => {
 
     booking.labOwner = labOwnerId;
     booking.assignedLabAssistant = null;
+
+    if (booking.patientLatitude && booking.patientLongitude && labOwner.latitude && labOwner.longitude) {
+      booking.assignedDistance = getDistance(
+        { latitude: booking.patientLatitude, longitude: booking.patientLongitude },
+        { latitude: labOwner.latitude, longitude: labOwner.longitude }
+      );
+    }
 
     await booking.save();
 

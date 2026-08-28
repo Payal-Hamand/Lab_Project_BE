@@ -9,7 +9,8 @@ import {
 } from "../controllers/packageController.js";
 
 import protect from "../middleware/authMiddleware.js";
-import authorizeRoles from "../middleware/roleMiddleware.js";
+import { authorizePermissions } from "../middleware/roleMiddleware.js";
+import imageUpload from "../middleware/imageUpload.js";
 
 const router = express.Router();
 
@@ -21,21 +22,23 @@ router.get("/:id", getSinglePackage);
 router.post(
   "/",
   protect,
-  authorizeRoles("admin"),
+  authorizePermissions("packages", "create"),
+  imageUpload.single("image"),
   createPackage
 );
 
 router.put(
   "/:id",
   protect,
-  authorizeRoles("admin"),
+  authorizePermissions("packages", "update"),
+  imageUpload.single("image"),
   updatePackage
 );
 
 router.delete(
   "/:id",
   protect,
-  authorizeRoles("admin"),
+  authorizePermissions("packages", "delete"),
   deletePackage
 );
 

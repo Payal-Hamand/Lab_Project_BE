@@ -2,6 +2,7 @@
   import sha256 from "sha256";
   import uniqid from "uniqid";
   import Booking from "../models/Booking.js";
+  import logger from "../Utils/logger.js";
 
   export const createPayment =
     async (req, res) => {
@@ -70,10 +71,7 @@
           "/pg/v1/pay" +
           process.env.SALT_KEY;
 
-          console.log(
-          "Payload:",
-          process.env.SALT_KEY,
-        );
+
 
         const xVerify =
           sha256(key) +
@@ -105,9 +103,7 @@
             }
           );
 
-        console.log(
-          response.data
-        );
+        logger.info("PhonePe payment response", { data: response.data });
 
         const phonepeUrl =
           response.data.data
@@ -124,10 +120,7 @@
 
       } catch (error) {
 
-        console.log(
-          error.response?.data ||
-          error.message
-        );
+        logger.error("PhonePe payment error", { message: error.message, response: error.response?.data });
 
         return res.status(500)
           .json({
@@ -166,9 +159,7 @@
       }
     );
 
-    console.log(
-      JSON.stringify(response.data, null, 2)
-    );
+    logger.info("PhonePe payment response", { data: response.data });
 
     const booking = await Booking.findOne({
       transactionId: txnId,
@@ -183,15 +174,9 @@
     const paymentState =
       response?.data?.data?.state;
 
-    console.log(
-  "Full PhonePe Response:",
-  JSON.stringify(response.data, null, 2)
-);
+    logger.info("Full PhonePe response", { data: response.data });
 
-console.log(
-  "Payment State:",
-  response?.data?.data?.state
-);
+    logger.info("PhonePe payment state", { state: response?.data?.data?.state });
 
     // SUCCESS
     if (paymentState === "COMPLETED") {
@@ -226,9 +211,7 @@ console.log(
     );
 
   } catch (error) {
-    console.log(
-      error.response?.data || error.message
-    );
+    logger.error("PhonePe payment error", { message: error.message, response: error.response?.data });
     return res.redirect(
       `${process.env.FRONT_END_URL}/lab-assistant?payment=error`
     );

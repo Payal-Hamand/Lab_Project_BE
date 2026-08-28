@@ -10,10 +10,22 @@ const testSchema = new mongoose.Schema(
       unique: true,
     },
 
-    category: {
+    shortName: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
+    },
+
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+
+    subcategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subcategory",
+     
     },
 
     price: {
@@ -22,20 +34,72 @@ const testSchema = new mongoose.Schema(
       min: 1,
     },
 
+    discount: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+
+    offerPrice: {
+      type: Number,
+      default: 0,
+    },
+
+    tax: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
     reportTime: {
       type: String,
       required: true,
     },
 
-    description: {
+    shortDescription: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
+    },
+
+    preparationInstructions: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    reportIncludes: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    fastingRequired: {
+      type: Boolean,
+      default: false,
+    },
+
+    collectionMethod: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    sampleType: {
+      type: String,
+      trim: true,
+      default: "",
     },
 
     image: {
       type: String,
-      required: true,
+      default: "",
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -43,6 +107,9 @@ const testSchema = new mongoose.Schema(
   }
 );
 
-const Test = mongoose.model("Test", testSchema);
+const Test = mongoose.model(
+  "Test",
+  testSchema
+);
 
 export default Test;

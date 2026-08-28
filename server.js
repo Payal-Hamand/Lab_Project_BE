@@ -6,10 +6,11 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
-
 import connectDB from "./config/db.js";
 import { seedRoles } from "./seeder/roleSeeder.js";
 import { seedAdmin } from "./seeder/userSeeder.js";
+import logger from "./Utils/logger.js";
+import requestLogger from "./middleware/requestLogger.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
@@ -36,7 +37,7 @@ const requiredEnvVars = ["MONGO_URI", "JWT_SECRET", "SALT_KEY", "MERCHANT_ID"];
 
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
-    console.error(`Missing required environment variable: ${envVar}`);
+    logger.error(`Missing required environment variable: ${envVar}`);
     process.exit(1);
   }
 }
@@ -118,6 +119,10 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
+/* ---------- Request Logger ---------- */
+
+app.use(requestLogger);
+
 /* ---------- Health ---------- */
 
 app.get("/", (req, res) => {
@@ -160,7 +165,12 @@ app.use((req, res) => {
 /* ---------- Error Handler ---------- */
 
 app.use((err, req, res, next) => {
-  console.error(err);
+  logger.error("Unhandled error", {
+    message: err.message,
+    stack: err.stack,
+    url: req.originalUrl,
+    method: req.method,
+  });
 
   const message =
     process.env.NODE_ENV === "production"
@@ -173,14 +183,23 @@ app.use((err, req, res, next) => {
   });
 });
 
-/* ---------- Process Error Handlers ---------- */
+/* ---------- Process Error Handlers (Winston handles these too, but kept as safety net) ---------- */
 
-process.on("unhandledRejection", (err) => {
-  console.error("Unhandled Rejection:", err.message);
+process.on("unhandledRejection", (reason, promise) => {
+  logger.error("Unhandled Rejection", {
+    message: reason?.message || String(reason),
+    stack: reason?.stack,
+    type: reason?.name || typeof reason,
+  });
 });
 
 process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err.message);
+  logger.error("Uncaught Exception", {
+    message: err.message,
+    stack: err.stack,
+    type: err.name,
+  });
+  process.exit(1);
 });
 
 /* ---------- Server ---------- */
@@ -188,7 +207,7 @@ process.on("uncaughtException", (err) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`, { env: process.env.NODE_ENV || "development" });
 });
 
 export default app;

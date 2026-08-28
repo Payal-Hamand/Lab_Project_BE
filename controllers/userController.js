@@ -1,5 +1,7 @@
 import User from '../models/User.js'
 import bcrypt from "bcryptjs";
+import MESSAGES from "../Utils/messages.js";
+import logger from "../Utils/logger.js";
 
 
 export const getMyAssistants =
@@ -22,6 +24,7 @@ export const getMyAssistants =
         .json(assistants)
 
     } catch (error) {
+      logger.error(error);
 
       res.status(500).json({
 
@@ -49,6 +52,7 @@ export const getAllUsers = async (req, res) => {
     });
 
   } catch (error) {
+    logger.error(error);
 
     res.status(500).json({
       success: false,
@@ -71,7 +75,7 @@ export const getSingleUser = async (req, res) => {
 
       return res.status(404).json({
         success: false,
-        message: "User Not Found"
+        message: MESSAGES.USER.NOT_FOUND
       });
 
     }
@@ -82,6 +86,7 @@ export const getSingleUser = async (req, res) => {
     });
 
   } catch (error) {
+    logger.error(error);
 
     res.status(500).json({
       success: false,
@@ -104,7 +109,7 @@ export const updateUser = async (req, res) => {
 
       return res.status(404).json({
         success: false,
-        message: "User Not Found"
+        message: MESSAGES.USER.NOT_FOUND
       });
 
     }
@@ -143,11 +148,12 @@ export const updateUser = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "User Updated Successfully",
+      message: MESSAGES.USER.UPDATED,
       data: user
     });
 
   } catch (error) {
+    logger.error(error);
 
     res.status(500).json({
       success: false,
@@ -170,7 +176,7 @@ export const deleteUser = async (req, res) => {
 
       return res.status(404).json({
         success: false,
-        message: "User Not Found"
+        message: MESSAGES.USER.NOT_FOUND
       });
 
     }
@@ -179,10 +185,11 @@ export const deleteUser = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "User Deleted Successfully"
+      message: MESSAGES.USER.DELETED
     });
 
   } catch (error) {
+    logger.error(error);
 
     res.status(500).json({
       success: false,

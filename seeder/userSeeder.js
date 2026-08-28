@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
+import logger from "../Utils/logger.js";
 
 const defaultAdmin = {
   name: "Admin",
@@ -13,7 +14,7 @@ export const seedAdmin = async () => {
   try {
     const exists = await User.findOne({ role: "admin" });
     if (exists) {
-      console.log("Admin user already exists, skipping seed");
+      logger.info("Admin user already exists, skipping seed");
       return;
     }
 
@@ -27,8 +28,8 @@ export const seedAdmin = async () => {
       role: defaultAdmin.role,
     });
 
-    console.log(`Admin seeded: ${defaultAdmin.email}`);
+    logger.info(`Admin seeded: ${defaultAdmin.email}`);
   } catch (error) {
-    console.error("Error seeding admin:", error.message);
+    logger.error("Error seeding admin", { message: error.message });
   }
 };

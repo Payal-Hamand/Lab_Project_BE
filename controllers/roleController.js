@@ -1,5 +1,7 @@
 import Role from "../models/Role.js";
 import User from "../models/User.js";
+import MESSAGES from "../Utils/messages.js";
+import logger from "../Utils/logger.js";
 
 const AVAILABLE_RESOURCES = [
   "users",
@@ -33,7 +35,7 @@ export const createRole = async (req, res) => {
     if (!name || !displayName) {
       return res.status(400).json({
         success: false,
-        message: "Name and display name are required",
+        message: MESSAGES.ROLE.NAME_DISPLAY_NAME_REQUIRED,
       });
     }
 
@@ -41,7 +43,7 @@ export const createRole = async (req, res) => {
     if (existing) {
       return res.status(409).json({
         success: false,
-        message: "Role already exists",
+        message: MESSAGES.ROLE.ALREADY_EXISTS,
       });
     }
 
@@ -68,13 +70,14 @@ export const createRole = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Role created successfully",
+      message: MESSAGES.ROLE.CREATED,
       role,
     });
   } catch (error) {
+    logger.error(error);
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: MESSAGES.SERVER_ERROR,
     });
   }
 };
@@ -99,9 +102,10 @@ export const getAllRoles = async (req, res) => {
       roles,
     });
   } catch (error) {
+    logger.error(error);
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: MESSAGES.SERVER_ERROR,
     });
   }
 };
@@ -113,7 +117,7 @@ export const getRoleById = async (req, res) => {
     if (!role) {
       return res.status(404).json({
         success: false,
-        message: "Role not found",
+        message: MESSAGES.ROLE.NOT_FOUND,
       });
     }
 
@@ -122,9 +126,10 @@ export const getRoleById = async (req, res) => {
       role,
     });
   } catch (error) {
+    logger.error(error);
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: MESSAGES.SERVER_ERROR,
     });
   }
 };
@@ -137,7 +142,7 @@ export const updateRole = async (req, res) => {
     if (!role) {
       return res.status(404).json({
         success: false,
-        message: "Role not found",
+        message: MESSAGES.ROLE.NOT_FOUND,
       });
     }
 
@@ -148,13 +153,14 @@ export const updateRole = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Role updated successfully",
+      message: MESSAGES.ROLE.UPDATED,
       role,
     });
   } catch (error) {
+    logger.error(error);
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: MESSAGES.SERVER_ERROR,
     });
   }
 };
@@ -166,14 +172,14 @@ export const deleteRole = async (req, res) => {
     if (!role) {
       return res.status(404).json({
         success: false,
-        message: "Role not found",
+        message: MESSAGES.ROLE.NOT_FOUND,
       });
     }
 
-    if (role.isSystem && role.name === "admin") {
+    if (role.isSystem) {
       return res.status(400).json({
         success: false,
-        message: "Cannot delete admin role",
+        message: MESSAGES.ROLE.CANNOT_DELETE_SYSTEM,
       });
     }
 
@@ -182,7 +188,7 @@ export const deleteRole = async (req, res) => {
     if (usersWithRole > 0) {
       return res.status(400).json({
         success: false,
-        message: `Cannot delete role. ${usersWithRole} user(s) assigned to this role.`,
+        message: MESSAGES.ROLE.CANNOT_DELETE_ASSIGNED(usersWithRole),
       });
     }
 
@@ -190,12 +196,13 @@ export const deleteRole = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Role deleted successfully",
+      message: MESSAGES.ROLE.DELETED,
     });
   } catch (error) {
+    logger.error(error);
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: MESSAGES.SERVER_ERROR,
     });
   }
 };
@@ -207,7 +214,7 @@ export const updateRolePermissions = async (req, res) => {
     if (!permissions || typeof permissions !== "object") {
       return res.status(400).json({
         success: false,
-        message: "Permissions object is required",
+        message: MESSAGES.ROLE.PERMISSIONS_OBJECT_REQUIRED,
       });
     }
 
@@ -215,7 +222,7 @@ export const updateRolePermissions = async (req, res) => {
     if (!role) {
       return res.status(404).json({
         success: false,
-        message: "Role not found",
+        message: MESSAGES.ROLE.NOT_FOUND,
       });
     }
 
@@ -241,13 +248,14 @@ export const updateRolePermissions = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Permissions updated successfully",
+      message: MESSAGES.ROLE.PERMISSIONS_UPDATED,
       role,
     });
   } catch (error) {
+    logger.error(error);
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: MESSAGES.SERVER_ERROR,
     });
   }
 };
@@ -259,7 +267,7 @@ export const assignRole = async (req, res) => {
     if (!userId || !roleName) {
       return res.status(400).json({
         success: false,
-        message: "userId and roleName are required",
+        message: MESSAGES.ROLE.USER_ID_ROLE_NAME_REQUIRED,
       });
     }
 
@@ -267,7 +275,7 @@ export const assignRole = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: MESSAGES.USER.NOT_FOUND,
       });
     }
 
@@ -275,7 +283,7 @@ export const assignRole = async (req, res) => {
     if (!role) {
       return res.status(404).json({
         success: false,
-        message: "Role not found",
+        message: MESSAGES.ROLE.NOT_FOUND,
       });
     }
 
@@ -284,7 +292,7 @@ export const assignRole = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Role "${role.displayName}" assigned to ${user.name}`,
+      message: MESSAGES.ROLE.ASSIGNED(role.displayName, user.name),
       user: {
         _id: user._id,
         name: user.name,
@@ -293,9 +301,10 @@ export const assignRole = async (req, res) => {
       },
     });
   } catch (error) {
+    logger.error(error);
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: MESSAGES.SERVER_ERROR,
     });
   }
 };

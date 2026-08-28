@@ -1,7 +1,8 @@
 import express from "express";
 
 import protect from "../middleware/authMiddleware.js";
-import authorizeRoles from "../middleware/roleMiddleware.js";
+import { authorizePermissions } from "../middleware/roleMiddleware.js";
+import imageUpload from "../middleware/imageUpload.js";
 
 import {
   createTest,
@@ -21,21 +22,23 @@ router.get("/:id", getSingleTest);
 router.post(
   "/",
   protect,
-  authorizeRoles("admin"),
+  authorizePermissions("tests", "create"),
+  imageUpload.single("image"),
   createTest
 );
 
 router.put(
   "/:id",
   protect,
-  authorizeRoles("admin"),
+  authorizePermissions("tests", "update"),
+  imageUpload.single("image"),
   updateTest
 );
 
 router.delete(
   "/:id",
   protect,
-  authorizeRoles("admin"),
+  authorizePermissions("tests", "delete"),
   deleteTest
 );
 

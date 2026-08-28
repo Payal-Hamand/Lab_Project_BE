@@ -1,4 +1,5 @@
 import Role from "../models/Role.js";
+import logger from "../Utils/logger.js";
 
 const defaultRoles = [
   {
@@ -69,14 +70,14 @@ export const seedRoles = async () => {
       const exists = await Role.findOne({ name: roleData.name });
       if (!exists) {
         await Role.create(roleData);
-        console.log(`Role "${roleData.name}" seeded`);
+        logger.info(`Role "${roleData.name}" seeded`);
       } else {
         exists.permissions = roleData.permissions;
         await exists.save();
-        console.log(`Role "${roleData.name}" permissions updated`);
+        logger.info(`Role "${roleData.name}" permissions updated`);
       }
     }
   } catch (error) {
-    console.error("Error seeding roles:", error.message);
+    logger.error("Error seeding roles", { message: error.message });
   }
 };
